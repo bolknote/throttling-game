@@ -15,7 +15,7 @@
 #include <IOKit/hid/IOHIDLib.h>
 #include <ApplicationServices/ApplicationServices.h>
 
-#define END 999999
+#define END 9999
 
 static struct termios original_termios;
 
@@ -88,12 +88,12 @@ void* load_controller(__attribute__((unused)) void* arg) {
         pthread_mutex_unlock(&load_mutex);
 
         if (km < END) {
-            printf("\e[30;47;1m\r  %06ld  \e[0m", ++km);
+            printf("\e[30;47m\r  ⏱️ %06ld  \e[0m", ++km);
             if (current_load < .1 || current_load > .9) {
-                printf("\n\e[47m 💥💥💥💥\e[0m");
+                printf("\r\e[47m  💥");
             }
         } else {
-            printf("\e[30;47;1m\r YOU WON! \e[0m");
+            printf("\e[30;47;1m\r   YOU WON! \e[0m");
         }
         fflush(stdout);
         
@@ -124,13 +124,13 @@ void prepare_console() {
 }
 
 void print_counter() {
-    for (size_t i = 0; i < 3; i++) printf("\e[47m          \e[0m\n");
+    for (size_t i = 0; i < 3; i++) printf("\e[47m              \e[0m\n");
     printf("\e[2F");
 
     setlocale(LC_ALL, "");
-    const char *symbols[] = {"🟢🟢🟢", "🟢🟢🔴", "🟢🔴🔴", "🔴🔴🔴"};
+    const char *symbols[] = {"🟢 🟢 🟢", "🔴 🟢 🟢", "🔴 🔴 🟢", "🔴 🔴 🔴"};
     for (size_t i = 0; i < 4; i++) {
-        printf("\e[47m\r  %s  \e[0m", symbols[i]);
+        printf("\e[47m\r   %s   \e[0m", symbols[i]);
         fflush(stdout);
         sleep(1);
     }
