@@ -89,6 +89,9 @@ void* load_controller(__attribute__((unused)) void* arg) {
 
         if (km < END) {
             printf("\e[30;47;1m\r  %06ld  \e[0m", ++km);
+            if (current_load < .1 || current_load > .9) {
+                printf("\n\e[47m 💥💥💥💥\e[0m");
+            }
         } else {
             printf("\e[30;47;1m\r YOU WON! \e[0m");
         }
@@ -125,7 +128,7 @@ void print_counter() {
     printf("\e[2F");
 
     setlocale(LC_ALL, "");
-    const char *symbols[] = {"🟢🟢🟢", "🔴🟢🟢", "🔴🔴🟢", "🔴🔴🔴"};
+    const char *symbols[] = {"🟢🟢🟢", "🟢🟢🔴", "🟢🔴🔴", "🔴🔴🔴"};
     for (size_t i = 0; i < 4; i++) {
         printf("\e[47m\r  %s  \e[0m", symbols[i]);
         fflush(stdout);
