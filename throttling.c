@@ -125,7 +125,7 @@ void print_counter() {
     printf("\e[2F");
 
     setlocale(LC_ALL, "");
-    const char *symbols[] = {"🔴🔴🔴", "🟢🔴🔴", "🟢🟢🔴", "🟢🟢🟢"};
+    const char *symbols[] = {"🟢🟢🟢", "🔴🟢🟢", "🔴🔴🟢", "🔴🔴🔴"};
     for (size_t i = 0; i < 4; i++) {
         printf("\e[47m\r  %s  \e[0m", symbols[i]);
         fflush(stdout);
