@@ -1,5 +1,5 @@
 CC = clang
-CFLAGS = -Wall -Wextra
+CFLAGS = -Wall -Wextra -std=c2x
 FRAMEWORKS = -framework ApplicationServices
 TARGET = throttling
 SRC = throttling.c

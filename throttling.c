@@ -42,7 +42,7 @@ void* cpu_load(void* arg) {
     thread_policy_set(thread, THREAD_AFFINITY_POLICY, 
                     (thread_policy_t)&policy, THREAD_AFFINITY_POLICY_COUNT);
 
-    const uint64_t interval = 10000000;
+    const uint64_t interval = 10'000'000;
     uint64_t start_time, current_time;
 
     while(!atomic_load(&should_exit)) {
@@ -63,7 +63,7 @@ void* cpu_load(void* arg) {
     return NULL;
 }
 
-void* load_controller(__attribute__((unused)) void* arg) {
+void* load_controller([[maybe_unused]] void* arg) {
     const uint64_t update_interval = 150000;
     const float step = (float) rand() / RAND_MAX * 0.008 + 0.001;
     long km = 0;
@@ -103,7 +103,7 @@ void* load_controller(__attribute__((unused)) void* arg) {
     return NULL;
 }
 
-void restore_cursor(__attribute__((unused)) int sig) {
+[[noreturn]] void restore_cursor([[maybe_unused]] int sig) {
     printf("\e[?25h\e[0m\e\n\n");
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &original_termios);
     exit(0);
@@ -128,7 +128,7 @@ void print_counter() {
     printf("\e[2F");
 
     setlocale(LC_ALL, "");
-    const char *symbols[] = {"🟢 🟢 🟢", "🔴 🟢 🟢", "🔴 🔴 🟢", "🔴 🔴 🔴"};
+    const char *symbols[] = {u8"🟢 🟢 🟢", u8"🔴 🟢 🟢", u8"🔴 🔴 🟢", u8"🔴 🔴 🔴"};
     for (size_t i = 0; i < 4; i++) {
         printf("\e[47m\r   %s   \e[0m", symbols[i]);
         fflush(stdout);
@@ -143,11 +143,13 @@ void check_keyboard_permission() {
         printf("This app requires accessibility permissions to monitor keyboard input.\n");
         printf("Please enable it in System Preferences → Security & Privacy → Accessibility.\n");
 
-        CFStringRef keys[] = { kAXTrustedCheckOptionPrompt };
-        CFBooleanRef values[] = { kCFBooleanTrue };
         CFDictionaryRef options = CFDictionaryCreate(
-            NULL, (const void **)keys, (const void **)values, 1,
-            &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks
+            NULL, 
+            (const void*[]){kAXTrustedCheckOptionPrompt}, 
+            (const void*[]){kCFBooleanTrue}, 
+            1,
+            &kCFTypeDictionaryKeyCallBacks, 
+            &kCFTypeDictionaryValueCallBacks
         );
 
         AXIsProcessTrustedWithOptions(options);
@@ -163,19 +165,19 @@ int main() {
     prepare_console();
     print_counter();
 
-    long core_count = sysconf(_SC_NPROCESSORS_ONLN);
+    int core_count = sysconf(_SC_NPROCESSORS_ONLN);
     pthread_t threads[core_count];
-    long core_ids[core_count];
+    int core_ids[core_count];
     
     pthread_t controller_thread;
-    pthread_create(&controller_thread, NULL, load_controller, NULL);
+    pthread_create(&controller_thread, nullptr, load_controller, nullptr);
 
-    for(long i = 0; i < core_count; i++) {
+    for(int i = 0; i < core_count; i++) {
         core_ids[i] = i;
         pthread_create(&threads[i], NULL, cpu_load, &core_ids[i]);
     }
 
-    for(long i = 0; i < core_count; i++) {
+    for(int i = 0; i < core_count; i++) {
         pthread_join(threads[i], NULL);
     }
  
