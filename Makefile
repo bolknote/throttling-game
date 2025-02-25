@@ -1,8 +1,14 @@
 CC = clang
 CFLAGS = -Wall -Wextra
-FRAMEWORKS = -framework CoreGraphics -framework IOKit -framework CoreFoundation -framework ApplicationServices
+FRAMEWORKS = -framework ApplicationServices
 TARGET = throttling
 SRC = throttling.c
+
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+else
+$(error This game only works on macOS)
+endif
 
 all: $(TARGET)
 
